@@ -255,7 +255,7 @@
             background: #922e39;
         }
         
-        /* new top bar: only sort + export, search/date removed */
+        /* action bar: sort + export */
         .action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -301,9 +301,16 @@
             flex-wrap: wrap;
         }
         
+        /* clear data button container - above table */
+        .clear-data-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.75rem;
+        }
+        
         .charts-row {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* only bar + pie */
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -349,7 +356,7 @@
             border-radius: 1.5rem;
             padding: 0.5rem;
             overflow-x: auto;
-            margin-top: 1.5rem;
+            margin-top: 0.5rem;
             -webkit-overflow-scrolling: touch;
             max-height: 500px;
             overflow-y: auto;
@@ -521,10 +528,10 @@
         <div class="input-group"><label>date</label><input type="date" id="entryDate"></div>
         <div class="input-group"><label>note</label><textarea id="note" rows="1" placeholder="note..."></textarea></div>
         <button class="btn btn-primary" id="addBtn"><i class="fas fa-plus-circle"></i> Add</button>
-        <button class="btn btn-danger" id="clearDataBtn"><i class="fas fa-trash-alt"></i> Clear data</button>
+        <!-- Clear data button moved from here to above the table -->
     </div>
 
-    <!-- new simplified top bar: only sort + export buttons (search/date removed) -->
+    <!-- action bar: sort + export (no search/date) -->
     <div class="action-bar">
         <div class="sort-wrapper">
             <label for="sortSelect"><i class="fas fa-sort"></i> Sort by</label>
@@ -546,6 +553,11 @@
         <div class="chart-card"><canvas id="pieChart"></canvas></div>
     </div>
 
+    <!-- Clear data button placed directly above the table -->
+    <div class="clear-data-container">
+        <button class="btn btn-danger" id="clearDataBtn"><i class="fas fa-trash-alt"></i> Clear all data</button>
+    </div>
+
     <div class="table-wrapper glass" id="tableWrapper">
         <table id="entryTable">
             <thead><tr><th>Type</th><th>Amount</th><th>Category</th><th>Person</th><th>Date</th><th>Note</th><th style="width:50px;">Action</th></tr></thead>
@@ -561,8 +573,8 @@
     'use strict';
 
     // ==================== PRODUCTION FINANCE MODULE ====================
-    // No search/date filters, only sort above table.
-    // PDF and Excel exports generate actual downloadable files with all transactions.
+    // Clear data button placed above the table as requested.
+    // No sample data. Real PDF/Excel exports.
     
     // --------------------------------------------------------------------
     // Color Generator 
@@ -647,11 +659,9 @@
                 return true;
             },
             clearAll,
-            // filter: only sort applied (no search/date)
             query: (sortOption, page = 1, pageSize = 30) => {
-                let filtered = [...transactions]; // copy
+                let filtered = [...transactions];
                 
-                // sorting
                 if (sortOption === 'date-desc') {
                     filtered.sort((a, b) => b.ts - a.ts);
                 } else if (sortOption === 'date-asc') {
@@ -674,7 +684,6 @@
                     totalPages: Math.ceil(total / pageSize)
                 };
             },
-            // for KPI and charts: we need all data (no filter)
             getAllSorted: (sortOption) => {
                 let all = [...transactions];
                 if (sortOption === 'date-desc') all.sort((a, b) => b.ts - a.ts);
@@ -909,7 +918,7 @@
     })();
 
     // --------------------------------------------------------------------
-    // Export functions (real PDF / Excel)
+    // Export functions
     // --------------------------------------------------------------------
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
@@ -932,7 +941,7 @@
         doc.text('Note', 160, y);
         y += 6;
         
-        for (let t of all.slice(0, 100)) { // limit to 100 for PDF size
+        for (let t of all.slice(0, 100)) {
             if (y > 280) { doc.addPage(); y = 20; }
             doc.text(t.ty, 14, y);
             doc.text(UIManager.formatINR(t.a), 40, y);
@@ -974,7 +983,7 @@
             const result = DataStore.query(sort, page, 30);
             UIManager.renderTable(result);
             
-            const allData = DataStore.getAllSorted(sort); // all for KPI/charts
+            const allData = DataStore.getAllSorted(sort);
             const kpis = DataStore.calculateKPIs(allData);
             UIManager.updateKPI(kpis);
             ChartManager.update(allData);
@@ -1016,7 +1025,7 @@
         
         const init = () => {
             DataStore.init();
-            // no sample data
+            
             UIManager.elements.addBtn.addEventListener('click', handleAdd);
             UIManager.elements.clearDataBtn.addEventListener('click', handleClearAll);
             UIManager.elements.sortSelect.addEventListener('change', () => {
@@ -1058,4 +1067,3 @@
 </script>
 </body>
 </html>
-
