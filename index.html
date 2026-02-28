@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>LUXURY FINANCE | family portfolio</title>
+    <title>LUXURY FINANCE · family portfolio</title>
     <!-- Chart.js, jsPDF, SheetJS (XLSX) via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -153,7 +153,7 @@
         
         .form-panel {
             padding: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             display: flex;
             flex-wrap: wrap;
             gap: 0.8rem;
@@ -232,6 +232,16 @@
             color: white; 
         }
         
+        .btn-danger {
+            background: #b13e4b;
+            border-color: #c05562;
+            color: white;
+        }
+        
+        body.dark .btn-danger {
+            background: #aa3e4a;
+        }
+        
         .btn:hover { 
             transform: translateY(-2px); 
             box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.2); 
@@ -241,54 +251,59 @@
             background: #1f3170; 
         }
         
-        .filter-bar {
+        .btn-danger:hover {
+            background: #922e39;
+        }
+        
+        /* new top bar: only sort + export, search/date removed */
+        .action-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 1rem;
             margin-bottom: 1.5rem;
             align-items: center;
+            justify-content: space-between;
         }
         
-        .search-box { 
-            flex: 2; 
-            min-width: 200px; 
+        .sort-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
         
-        .date-range { 
-            display: flex; 
-            gap: 0.5rem; 
-            flex-wrap: wrap; 
-            flex: 1;
-            min-width: 250px;
+        .sort-wrapper label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.7;
+            text-transform: uppercase;
         }
         
-        .date-range .input-group {
-            min-width: 120px;
+        .sort-wrapper select {
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 2rem;
+            padding: 0.5rem 1.5rem 0.5rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            color: #111;
         }
         
-        .sort-select { 
-            min-width: 150px; 
-            flex: 1;
+        body.dark .sort-wrapper select {
+            background: rgba(15,20,35,0.6);
+            color: #f0f3ff;
+            border-color: rgba(255,255,255,0.1);
         }
         
         .export-buttons {
             display: flex;
             gap: 0.5rem;
-            margin-left: auto;
             flex-wrap: wrap;
-        }
-        
-        @media (max-width: 700px) {
-            .export-buttons {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-end;
-            }
         }
         
         .charts-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr); /* only bar + pie */
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -487,7 +502,7 @@
 <body>
 <div class="dashboard">
     <div class="header-row">
-        <div class="logo"><h1><i class="fas fa-chart-pie" style="margin-right: 8px;"></i>Expense Tracker-Mohith</h1></div>
+        <div class="logo"><h1><i class="fas fa-chart-pie" style="margin-right: 8px;"></i>finence · family</h1></div>
         <div class="theme-toggle" id="darkmodeToggle"><i class="fas fa-moon"></i> <span style="font-size: 0.8rem;">LUX</span></div>
     </div>
     
@@ -506,15 +521,20 @@
         <div class="input-group"><label>date</label><input type="date" id="entryDate"></div>
         <div class="input-group"><label>note</label><textarea id="note" rows="1" placeholder="note..."></textarea></div>
         <button class="btn btn-primary" id="addBtn"><i class="fas fa-plus-circle"></i> Add</button>
+        <button class="btn btn-danger" id="clearDataBtn"><i class="fas fa-trash-alt"></i> Clear data</button>
     </div>
 
-    <div class="filter-bar">
-        <div class="input-group search-box"><label>search</label><input type="text" id="searchInput" placeholder="note, category, person..."></div>
-        <div class="date-range">
-            <div class="input-group"><label>from</label><input type="date" id="dateFrom"></div>
-            <div class="input-group"><label>to</label><input type="date" id="dateTo"></div>
+    <!-- new simplified top bar: only sort + export buttons (search/date removed) -->
+    <div class="action-bar">
+        <div class="sort-wrapper">
+            <label for="sortSelect"><i class="fas fa-sort"></i> Sort by</label>
+            <select id="sortSelect">
+                <option value="date-desc">Date (newest first)</option>
+                <option value="date-asc">Date (oldest first)</option>
+                <option value="amount-desc">Amount (high to low)</option>
+                <option value="amount-asc">Amount (low to high)</option>
+            </select>
         </div>
-        <div class="input-group sort-select"><label>sort</label><select id="sortSelect"><option value="date-desc">date (newest)</option><option value="date-asc">date (oldest)</option><option value="amount-desc">amount high</option><option value="amount-asc">amount low</option></select></div>
         <div class="export-buttons">
             <button class="btn" id="exportPdf"><i class="fas fa-file-pdf"></i> PDF</button>
             <button class="btn" id="exportExcel"><i class="fas fa-file-excel"></i> Excel</button>
@@ -524,7 +544,6 @@
     <div class="charts-row">
         <div class="chart-card"><canvas id="barChart"></canvas></div>
         <div class="chart-card"><canvas id="pieChart"></canvas></div>
-        <div class="chart-card"><canvas id="lineChart"></canvas></div>
     </div>
 
     <div class="table-wrapper glass" id="tableWrapper">
@@ -541,14 +560,13 @@
 (function() {
     'use strict';
 
-    // ==================== STABLE PRODUCTION FINANCE MODULE ====================
-    // No edit functionality - only Add + Delete
-    // Optimized for 30,000+ transactions
-    // Perfect pie chart with all categories
+    // ==================== PRODUCTION FINANCE MODULE ====================
+    // No search/date filters, only sort above table.
+    // PDF and Excel exports generate actual downloadable files with all transactions.
     
-    // ------------------------------------------------------------------------
-    // Color Generator with Persistent Cache
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------
+    // Color Generator 
+    // --------------------------------------------------------------------
     const ColorGenerator = {
         cache: new Map(),
         hue: 0.7,
@@ -567,14 +585,13 @@
         }
     };
 
-    // ------------------------------------------------------------------------
-    // Data Store - Simple, Fast, Reliable
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------
+    // Data Store
+    // --------------------------------------------------------------------
     const DataStore = (function() {
         let transactions = [];
         let nextId = 1;
         
-        // Load from localStorage
         const load = () => {
             try {
                 const stored = localStorage.getItem('finance_production');
@@ -582,48 +599,39 @@
                     const data = JSON.parse(stored);
                     transactions = data.transactions || [];
                     nextId = data.nextId || 1;
-                    
-                    // Ensure all transactions have timestamps
                     transactions.forEach(t => {
-                        if (!t.ts) {
-                            t.ts = new Date(t.date).getTime();
-                        }
+                        if (!t.ts) t.ts = new Date(t.date).getTime();
                     });
                 } else {
                     transactions = [];
                     nextId = 1;
                 }
             } catch (e) {
-                console.error('Error loading:', e);
                 transactions = [];
                 nextId = 1;
             }
         };
         
-        // Save to localStorage
         const save = () => {
             try {
-                const data = {
-                    transactions: transactions,
-                    nextId: nextId
-                };
-                localStorage.setItem('finance_production', JSON.stringify(data));
+                localStorage.setItem('finance_production', JSON.stringify({ transactions, nextId }));
                 return true;
             } catch (e) {
-                console.error('Save failed:', e);
                 alert('Storage limit reached. Please export and clear data.');
                 return false;
             }
         };
         
-        // Public API
+        const clearAll = () => {
+            transactions = [];
+            nextId = 1;
+            save();
+        };
+        
         return {
             init: load,
-            
             getAll: () => transactions,
-            
             getCount: () => transactions.length,
-            
             add: (tx) => {
                 tx.id = nextId++;
                 tx.ts = new Date(tx.date).getTime();
@@ -631,55 +639,29 @@
                 save();
                 return tx;
             },
-            
             delete: (id) => {
-                const index = transactions.findIndex(t => t.id === id);
-                if (index === -1) return false;
-                
-                transactions.splice(index, 1);
+                const idx = transactions.findIndex(t => t.id === id);
+                if (idx === -1) return false;
+                transactions.splice(idx, 1);
                 save();
                 return true;
             },
-            
-            // Filter, sort and paginate in one pass
-            query: (filters, page = 1, pageSize = 30) => {
-                // Start with all transactions
-                let filtered = transactions;
+            clearAll,
+            // filter: only sort applied (no search/date)
+            query: (sortOption, page = 1, pageSize = 30) => {
+                let filtered = [...transactions]; // copy
                 
-                // Apply search filter
-                if (filters.search && filters.search.trim() !== '') {
-                    const term = filters.search.toLowerCase().trim();
-                    filtered = filtered.filter(t => 
-                        (t.n && t.n.toLowerCase().includes(term)) || 
-                        (t.c && t.c.toLowerCase().includes(term)) ||
-                        (t.p && t.p.toLowerCase().includes(term)) ||
-                        (t.ty && t.ty.toLowerCase().includes(term))
-                    );
+                // sorting
+                if (sortOption === 'date-desc') {
+                    filtered.sort((a, b) => b.ts - a.ts);
+                } else if (sortOption === 'date-asc') {
+                    filtered.sort((a, b) => a.ts - b.ts);
+                } else if (sortOption === 'amount-desc') {
+                    filtered.sort((a, b) => b.a - a.a);
+                } else if (sortOption === 'amount-asc') {
+                    filtered.sort((a, b) => a.a - b.a);
                 }
                 
-                // Apply date range
-                if (filters.dateFrom) {
-                    const from = new Date(filters.dateFrom).getTime();
-                    filtered = filtered.filter(t => t.ts >= from);
-                }
-                
-                if (filters.dateTo) {
-                    const to = new Date(filters.dateTo).getTime() + 86400000;
-                    filtered = filtered.filter(t => t.ts <= to);
-                }
-                
-                // Apply sorting (create new array to avoid mutating original)
-                if (filters.sort === 'date-desc') {
-                    filtered = [...filtered].sort((a, b) => b.ts - a.ts);
-                } else if (filters.sort === 'date-asc') {
-                    filtered = [...filtered].sort((a, b) => a.ts - b.ts);
-                } else if (filters.sort === 'amount-desc') {
-                    filtered = [...filtered].sort((a, b) => b.a - a.a);
-                } else if (filters.sort === 'amount-asc') {
-                    filtered = [...filtered].sort((a, b) => a.a - b.a);
-                }
-                
-                // Calculate pagination
                 const total = filtered.length;
                 const start = (page - 1) * pageSize;
                 const paginated = filtered.slice(start, start + pageSize);
@@ -692,99 +674,66 @@
                     totalPages: Math.ceil(total / pageSize)
                 };
             },
-            
-            // Calculate KPIs from filtered data
-            calculateKPIs: (filteredData) => {
-                let totalIncome = 0;
-                let totalExpense = 0;
+            // for KPI and charts: we need all data (no filter)
+            getAllSorted: (sortOption) => {
+                let all = [...transactions];
+                if (sortOption === 'date-desc') all.sort((a, b) => b.ts - a.ts);
+                else if (sortOption === 'date-asc') all.sort((a, b) => a.ts - b.ts);
+                else if (sortOption === 'amount-desc') all.sort((a, b) => b.a - a.a);
+                else if (sortOption === 'amount-asc') all.sort((a, b) => a.a - b.a);
+                return all;
+            },
+            calculateKPIs: (data) => {
+                let totalIncome = 0, totalExpense = 0;
                 const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                let monthIncome = 0;
-                let monthExpense = 0;
+                const currentMonth = now.getMonth(), currentYear = now.getFullYear();
+                let monthIncome = 0, monthExpense = 0;
                 const personExpenses = {};
                 
-                for (let i = 0; i < filteredData.length; i++) {
-                    const t = filteredData[i];
-                    
+                for (let t of data) {
                     if (t.ty === 'income') {
                         totalIncome += t.a;
-                        
                         const d = new Date(t.ts);
-                        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                            monthIncome += t.a;
-                        }
+                        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) monthIncome += t.a;
                     } else {
                         totalExpense += t.a;
-                        
                         const d = new Date(t.ts);
-                        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                            monthExpense += t.a;
-                        }
-                        
+                        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) monthExpense += t.a;
                         const person = t.p || 'Self';
                         personExpenses[person] = (personExpenses[person] || 0) + t.a;
                     }
                 }
-                
                 return {
-                    totalIncome,
-                    totalExpense,
-                    balance: totalIncome - totalExpense,
-                    monthIncome,
-                    monthExpense,
-                    monthBalance: monthIncome - monthExpense,
+                    totalIncome, totalExpense, balance: totalIncome - totalExpense,
+                    monthIncome, monthExpense, monthBalance: monthIncome - monthExpense,
                     personExpenses
                 };
             },
-            
-            // Get category totals for pie chart (from filtered data)
-            getCategoryTotals: (filteredData) => {
-                const categories = {};
-                
-                for (let i = 0; i < filteredData.length; i++) {
-                    const t = filteredData[i];
-                    if (t.ty === 'expense') {
-                        categories[t.c] = (categories[t.c] || 0) + t.a;
-                    }
-                }
-                
-                return categories;
+            getCategoryTotals: (data) => {
+                const cat = {};
+                for (let t of data) if (t.ty === 'expense') cat[t.c] = (cat[t.c] || 0) + t.a;
+                return cat;
             },
-            
-            // Get monthly aggregates for bar chart (last 12 months)
-            getMonthlyAggregates: (filteredData) => {
-                const now = Date.now();
-                const oneYearAgo = now - (365 * 86400000);
+            getMonthlyAggregates: (data) => {
+                const oneYearAgo = Date.now() - 365*86400000;
                 const monthly = {};
-                
-                for (let i = 0; i < filteredData.length; i++) {
-                    const t = filteredData[i];
-                    
+                for (let t of data) {
                     if (t.ts >= oneYearAgo) {
                         const d = new Date(t.ts);
-                        const monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                        
-                        if (!monthly[monthKey]) {
-                            monthly[monthKey] = { i: 0, e: 0 };
-                        }
-                        
-                        if (t.ty === 'income') {
-                            monthly[monthKey].i += t.a;
-                        } else {
-                            monthly[monthKey].e += t.a;
-                        }
+                        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+                        if (!monthly[key]) monthly[key] = { i:0, e:0 };
+                        if (t.ty === 'income') monthly[key].i += t.a;
+                        else monthly[key].e += t.a;
                     }
                 }
-                
                 return monthly;
             }
         };
     })();
 
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     // UI Manager
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------
     const UIManager = (function() {
         const elements = {
             totalIncome: document.getElementById('totalIncome'),
@@ -794,15 +743,13 @@
             tableBody: document.getElementById('tableBody'),
             emptyPlaceholder: document.getElementById('emptyPlaceholder'),
             addBtn: document.getElementById('addBtn'),
+            clearDataBtn: document.getElementById('clearDataBtn'),
             entryType: document.getElementById('entryType'),
             amount: document.getElementById('amount'),
             category: document.getElementById('category'),
             personSelect: document.getElementById('personSelect'),
             entryDate: document.getElementById('entryDate'),
             note: document.getElementById('note'),
-            searchInput: document.getElementById('searchInput'),
-            dateFrom: document.getElementById('dateFrom'),
-            dateTo: document.getElementById('dateTo'),
             sortSelect: document.getElementById('sortSelect'),
             pagination: document.getElementById('pagination')
         };
@@ -810,26 +757,18 @@
         let currentPage = 1;
         const pageSize = 30;
         
-        // Set today's date
         elements.entryDate.value = new Date().toISOString().split('T')[0];
         
-        // Format Indian Rupees
-        const formatINR = (num) => {
-            return '₹ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-        };
+        const formatINR = (num) => '₹ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         
-        // Show toast notification
         const showToast = (msg) => {
             const toast = document.createElement('div');
             toast.className = 'toast-success';
             toast.innerText = msg;
             document.body.appendChild(toast);
-            setTimeout(() => {
-                if (toast.parentNode) toast.remove();
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         };
         
-        // Reset form after add
         const resetForm = () => {
             elements.entryType.value = 'income';
             elements.amount.value = '';
@@ -839,7 +778,6 @@
             elements.note.value = '';
         };
         
-        // Update KPI cards
         const updateKPI = (kpis) => {
             elements.totalIncome.innerText = formatINR(kpis.totalIncome);
             elements.totalExpense.innerText = formatINR(kpis.totalExpense);
@@ -847,20 +785,13 @@
             
             let personHtml = '<div class="person-breakdown">';
             const persons = kpis.personExpenses;
-            
-            if (Object.keys(persons).length > 0) {
-                for (const [person, amount] of Object.entries(persons)) {
-                    personHtml += `<div>${person}: ${formatINR(amount)}</div>`;
-                }
-            } else {
-                personHtml += '<div>No expenses</div>';
-            }
+            if (Object.keys(persons).length) {
+                for (let [person, amt] of Object.entries(persons)) personHtml += `<div>${person}: ${formatINR(amt)}</div>`;
+            } else personHtml += '<div>No expenses</div>';
             personHtml += '</div>';
-            
             elements.netBalance.innerHTML = formatINR(kpis.balance) + personHtml;
         };
         
-        // Render table with paginated data
         const renderTable = (result) => {
             if (result.total === 0) {
                 elements.tableBody.innerHTML = '';
@@ -868,15 +799,12 @@
                 elements.pagination.innerHTML = '';
                 return;
             }
-            
             elements.emptyPlaceholder.style.display = 'none';
             
             let html = '';
-            for (let i = 0; i < result.data.length; i++) {
-                const t = result.data[i];
+            for (let t of result.data) {
                 const typeClass = t.ty === 'income' ? 'income-badge' : 'expense-badge';
                 const sign = t.ty === 'income' ? '' : '-';
-                
                 html += `<tr>
                     <td class="${typeClass}">${t.ty}</td>
                     <td>${sign}${formatINR(t.a)}</td>
@@ -884,51 +812,24 @@
                     <td>${t.p || 'Self'}</td>
                     <td>${t.date}</td>
                     <td>${t.n || ''}</td>
-                    <td class="entry-actions">
-                        <i class="fas fa-trash-alt" data-id="${t.id}" style="color:#b13e4b;" title="Delete"></i>
-                    </td>
+                    <td class="entry-actions"><i class="fas fa-trash-alt" data-id="${t.id}" style="color:#b13e4b;" title="Delete"></i></td>
                 </tr>`;
             }
-            
             elements.tableBody.innerHTML = html;
             
-            // Render pagination
             if (result.totalPages > 1) {
-                let paginationHtml = '';
-                
-                // First page
-                paginationHtml += `<button ${result.page === 1 ? 'disabled' : ''} data-page="1">«</button>`;
-                
-                // Previous page
-                paginationHtml += `<button ${result.page === 1 ? 'disabled' : ''} data-page="${result.page - 1}">‹</button>`;
-                
-                // Page numbers
-                const start = Math.max(1, result.page - 2);
-                const end = Math.min(result.totalPages, result.page + 2);
-                
-                for (let i = start; i <= end; i++) {
-                    paginationHtml += `<button class="${i === result.page ? 'active' : ''}" data-page="${i}">${i}</button>`;
-                }
-                
-                // Next page
-                paginationHtml += `<button ${result.page === result.totalPages ? 'disabled' : ''} data-page="${result.page + 1}">›</button>`;
-                
-                // Last page
-                paginationHtml += `<button ${result.page === result.totalPages ? 'disabled' : ''} data-page="${result.totalPages}">»</button>`;
-                
-                elements.pagination.innerHTML = paginationHtml;
-            } else {
-                elements.pagination.innerHTML = '';
-            }
+                let p = '';
+                p += `<button ${result.page===1?'disabled':''} data-page="1">«</button>`;
+                p += `<button ${result.page===1?'disabled':''} data-page="${result.page-1}">‹</button>`;
+                let start = Math.max(1, result.page-2), end = Math.min(result.totalPages, result.page+2);
+                for (let i=start; i<=end; i++) p += `<button class="${i===result.page?'active':''}" data-page="${i}">${i}</button>`;
+                p += `<button ${result.page===result.totalPages?'disabled':''} data-page="${result.page+1}">›</button>`;
+                p += `<button ${result.page===result.totalPages?'disabled':''} data-page="${result.totalPages}">»</button>`;
+                elements.pagination.innerHTML = p;
+            } else elements.pagination.innerHTML = '';
         };
         
-        // Get current filter values
-        const getFilters = () => ({
-            search: elements.searchInput.value,
-            dateFrom: elements.dateFrom.value,
-            dateTo: elements.dateTo.value,
-            sort: elements.sortSelect.value
-        });
+        const getCurrentSort = () => elements.sortSelect.value;
         
         return {
             elements,
@@ -937,181 +838,151 @@
             resetForm,
             updateKPI,
             renderTable,
-            getFilters,
+            getCurrentSort,
             currentPage: () => currentPage,
             setPage: (p) => { currentPage = p; }
         };
     })();
 
-    // ------------------------------------------------------------------------
-    // Chart Manager - With Perfect Pie Chart
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------
+    // Chart Manager
+    // --------------------------------------------------------------------
     const ChartManager = (function() {
-        const charts = {
-            bar: null,
-            pie: null,
-            line: null
-        };
+        let barChart = null, pieChart = null;
+        const barCanvas = document.getElementById('barChart');
+        const pieCanvas = document.getElementById('pieChart');
         
-        const elements = {
-            bar: document.getElementById('barChart'),
-            pie: document.getElementById('pieChart'),
-            line: document.getElementById('lineChart')
-        };
-        
-        let updateTimeout;
-        
-        const update = (filteredData) => {
-            if (updateTimeout) cancelAnimationFrame(updateTimeout);
-            updateTimeout = requestAnimationFrame(() => {
-                performUpdate(filteredData);
-            });
-        };
-        
-        const performUpdate = (filteredData) => {
-            // BAR CHART - Monthly trend (last 12 months)
-            if (elements.bar) {
-                const monthly = DataStore.getMonthlyAggregates(filteredData);
-                const sortedMonths = Object.keys(monthly).sort().slice(-12);
+        const update = (allData) => {
+            // bar
+            if (barCanvas) {
+                const monthly = DataStore.getMonthlyAggregates(allData);
+                const sorted = Object.keys(monthly).sort().slice(-12);
+                const labels = sorted.map(m => { let [y,mo]=m.split('-'); return mo+'/'+y.slice(2); });
+                const income = sorted.map(m => monthly[m].i||0);
+                const expense = sorted.map(m => monthly[m].e||0);
                 
-                const labels = sortedMonths.map(m => {
-                    const [year, month] = m.split('-');
-                    return month + '/' + year.slice(2);
-                });
-                
-                const incomeData = sortedMonths.map(m => monthly[m].i || 0);
-                const expenseData = sortedMonths.map(m => monthly[m].e || 0);
-                
-                if (charts.bar) {
-                    charts.bar.data.labels = labels;
-                    charts.bar.data.datasets[0].data = incomeData;
-                    charts.bar.data.datasets[1].data = expenseData;
-                    charts.bar.update('none');
+                if (barChart) {
+                    barChart.data.labels = labels;
+                    barChart.data.datasets[0].data = income;
+                    barChart.data.datasets[1].data = expense;
+                    barChart.update('none');
                 } else {
-                    charts.bar = new Chart(elements.bar, {
+                    barChart = new Chart(barCanvas, {
                         type: 'bar',
                         data: {
-                            labels: labels,
+                            labels,
                             datasets: [
-                                { label: 'Income', data: incomeData, backgroundColor: '#2a3f8a', borderRadius: 6 },
-                                { label: 'Expense', data: expenseData, backgroundColor: '#b13e4b', borderRadius: 6 }
+                                { label:'Income', data:income, backgroundColor:'#2a3f8a', borderRadius:6 },
+                                { label:'Expense', data:expense, backgroundColor:'#b13e4b', borderRadius:6 }
                             ]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: false,
-                            plugins: { legend: { display: false } }
-                        }
+                        options: { responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } } }
                     });
                 }
             }
-            
-            // PIE CHART - All categories from filtered data
-            if (elements.pie) {
-                const categories = DataStore.getCategoryTotals(filteredData);
+            // pie
+            if (pieCanvas) {
+                const categories = DataStore.getCategoryTotals(allData);
                 const labels = Object.keys(categories);
                 const data = Object.values(categories);
-                
-                // Generate colors for each category
                 ColorGenerator.reset();
                 const colors = labels.map(l => ColorGenerator.getColor(l));
                 
-                if (charts.pie) {
-                    charts.pie.data.labels = labels;
-                    charts.pie.data.datasets[0].data = data;
-                    charts.pie.data.datasets[0].backgroundColor = colors;
-                    charts.pie.update('none');
+                if (pieChart) {
+                    pieChart.data.labels = labels;
+                    pieChart.data.datasets[0].data = data;
+                    pieChart.data.datasets[0].backgroundColor = colors;
+                    pieChart.update('none');
                 } else {
-                    charts.pie = new Chart(elements.pie, {
+                    pieChart = new Chart(pieCanvas, {
                         type: 'pie',
                         data: {
-                            labels: labels,
-                            datasets: [{
-                                data: data,
-                                backgroundColor: colors,
-                                borderWidth: 0
-                            }]
+                            labels,
+                            datasets: [{ data, backgroundColor:colors, borderWidth:0 }]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: false,
-                            plugins: {
-                                legend: { position: 'bottom' }
-                            }
-                        }
-                    });
-                }
-            }
-            
-            // LINE CHART - Simplified
-            if (elements.line) {
-                if (!charts.line) {
-                    charts.line = new Chart(elements.line, {
-                        type: 'line',
-                        data: {
-                            datasets: [{
-                                label: 'Net Balance',
-                                data: [{ x: new Date().toISOString().split('T')[0], y: 0 }],
-                                borderColor: '#2a3f8a',
-                                tension: 0.2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: false
-                        }
+                        options: { responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ position:'bottom' } } }
                     });
                 }
             }
         };
-        
         return { update };
     })();
 
-    // ------------------------------------------------------------------------
-    // App Controller - Main Orchestrator
-    // ------------------------------------------------------------------------
-    const App = (function() {
-        let filterTimeout;
+    // --------------------------------------------------------------------
+    // Export functions (real PDF / Excel)
+    // --------------------------------------------------------------------
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const all = DataStore.getAll();
         
-        // Main refresh function
+        doc.setFontSize(16);
+        doc.text('Family Finance Report', 14, 20);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+        doc.text(`Total transactions: ${all.length}`, 14, 34);
+        
+        let y = 44;
+        doc.setFontSize(8);
+        doc.text('Type', 14, y);
+        doc.text('Amount', 40, y);
+        doc.text('Category', 70, y);
+        doc.text('Person', 100, y);
+        doc.text('Date', 130, y);
+        doc.text('Note', 160, y);
+        y += 6;
+        
+        for (let t of all.slice(0, 100)) { // limit to 100 for PDF size
+            if (y > 280) { doc.addPage(); y = 20; }
+            doc.text(t.ty, 14, y);
+            doc.text(UIManager.formatINR(t.a), 40, y);
+            doc.text(t.c, 70, y);
+            doc.text(t.p||'Self', 100, y);
+            doc.text(t.date, 130, y);
+            let note = t.n || '';
+            if (note.length > 15) note = note.substring(0,12)+'...';
+            doc.text(note, 160, y);
+            y += 5;
+        }
+        doc.save('finance_report.pdf');
+        UIManager.showToast('PDF downloaded');
+    }
+
+    function exportToExcel() {
+        const all = DataStore.getAll();
+        const rows = all.map(t => ({
+            Type: t.ty,
+            Amount: t.a,
+            Category: t.c,
+            Person: t.p || 'Self',
+            Date: t.date,
+            Note: t.n || ''
+        }));
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+        XLSX.writeFile(wb, 'finance_export.xlsx');
+        UIManager.showToast('Excel downloaded');
+    }
+
+    // --------------------------------------------------------------------
+    // App Controller
+    // --------------------------------------------------------------------
+    const App = (function() {
         const refresh = (page = UIManager.currentPage()) => {
-            const filters = UIManager.getFilters();
-            const result = DataStore.query(filters, page, 30);
-            
-            // Update table
+            const sort = UIManager.getCurrentSort();
+            const result = DataStore.query(sort, page, 30);
             UIManager.renderTable(result);
             
-            // Calculate KPIs from filtered data (all filtered, not just page)
-            const allFiltered = DataStore.query(filters, 1, 1000000).data;
-            const kpis = DataStore.calculateKPIs(allFiltered);
+            const allData = DataStore.getAllSorted(sort); // all for KPI/charts
+            const kpis = DataStore.calculateKPIs(allData);
             UIManager.updateKPI(kpis);
-            
-            // Update charts with filtered data
-            ChartManager.update(allFiltered);
+            ChartManager.update(allData);
         };
         
-        // Debounced refresh for search
-        const debouncedRefresh = () => {
-            if (filterTimeout) clearTimeout(filterTimeout);
-            filterTimeout = setTimeout(() => {
-                UIManager.setPage(1);
-                refresh(1);
-            }, 300);
-        };
-        
-        // Handle add transaction
         const handleAdd = () => {
             const amount = parseFloat(UIManager.elements.amount.value);
-            
-            if (!amount || amount <= 0) {
-                alert('Please enter a positive amount');
-                return;
-            }
-            
+            if (!amount || amount<=0) return alert('Positive amount required');
             DataStore.add({
                 ty: UIManager.elements.entryType.value,
                 a: amount,
@@ -1120,118 +991,68 @@
                 date: UIManager.elements.entryDate.value,
                 n: UIManager.elements.note.value
             });
-            
-            UIManager.showToast('Entry added successfully');
+            UIManager.showToast('Entry added');
             UIManager.resetForm();
-            
-            // Refresh to first page
             UIManager.setPage(1);
             refresh(1);
         };
         
-        // Handle delete
         const handleDelete = (id) => {
-            if (confirm('Delete this transaction? This action cannot be undone.')) {
+            if (confirm('Delete transaction?')) {
                 DataStore.delete(id);
-                UIManager.showToast('Entry deleted');
-                
-                // Refresh current page
+                UIManager.showToast('Deleted');
                 refresh(UIManager.currentPage());
             }
         };
         
-        // Initialize event listeners
-        const initEventListeners = () => {
-            // Add button
+        const handleClearAll = () => {
+            if (confirm('⚠️ Delete ALL transactions? Cannot undo.')) {
+                DataStore.clearAll();
+                UIManager.showToast('All data cleared');
+                UIManager.setPage(1);
+                refresh(1);
+            }
+        };
+        
+        const init = () => {
+            DataStore.init();
+            // no sample data
             UIManager.elements.addBtn.addEventListener('click', handleAdd);
-            
-            // Filter inputs
-            UIManager.elements.searchInput.addEventListener('input', debouncedRefresh);
-            UIManager.elements.dateFrom.addEventListener('change', () => {
-                UIManager.setPage(1);
-                refresh(1);
-            });
-            UIManager.elements.dateTo.addEventListener('change', () => {
-                UIManager.setPage(1);
-                refresh(1);
-            });
+            UIManager.elements.clearDataBtn.addEventListener('click', handleClearAll);
             UIManager.elements.sortSelect.addEventListener('change', () => {
                 UIManager.setPage(1);
                 refresh(1);
             });
             
-            // Table actions delegation (delete only)
             UIManager.elements.tableBody.addEventListener('click', (e) => {
-                const target = e.target;
-                if (target.classList.contains('fa-trash-alt')) {
-                    const id = parseInt(target.dataset.id);
-                    handleDelete(id);
+                if (e.target.classList.contains('fa-trash-alt')) {
+                    handleDelete(parseInt(e.target.dataset.id));
                 }
             });
             
-            // Pagination
             UIManager.elements.pagination.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON' && e.target.dataset.page && !e.target.disabled) {
-                    const page = parseInt(e.target.dataset.page);
-                    UIManager.setPage(page);
-                    refresh(page);
+                if (e.target.tagName==='BUTTON' && e.target.dataset.page && !e.target.disabled) {
+                    UIManager.setPage(parseInt(e.target.dataset.page));
+                    refresh(UIManager.currentPage());
                 }
             });
             
-            // Export buttons
-            document.getElementById('exportPdf').addEventListener('click', () => {
-                const count = DataStore.getCount();
-                alert(`PDF Export - ${count} transactions\n\nThis would generate a PDF report with all transactions.`);
-            });
+            document.getElementById('exportPdf').addEventListener('click', exportToPDF);
+            document.getElementById('exportExcel').addEventListener('click', exportToExcel);
             
-            document.getElementById('exportExcel').addEventListener('click', () => {
-                const count = DataStore.getCount();
-                alert(`Excel Export - ${count} transactions\n\nThis would generate an Excel file with all data.`);
-            });
-            
-            // Dark mode toggle
             document.getElementById('darkmodeToggle').addEventListener('click', () => {
                 document.body.classList.toggle('dark');
                 const toggle = document.getElementById('darkmodeToggle');
                 toggle.innerHTML = document.body.classList.contains('dark') ? 
-                    '<i class="fas fa-sun"></i> LIGHT' : 
-                    '<i class="fas fa-moon"></i> LUX';
+                    '<i class="fas fa-sun"></i> LIGHT' : '<i class="fas fa-moon"></i> LUX';
             });
+            
+            refresh(1);
         };
         
-        // Initialize with sample data if empty
-        const initSampleData = () => {
-            if (DataStore.getCount() === 0) {
-                const categories = ['Salary', 'Food', 'Transport', 'Bills', 'Shopping', 'Entertainment', 'Healthcare', 'Education', 'Rent', 'Other'];
-                const persons = ['Self', 'Father', 'Mother', 'Brother'];
-                const types = ['income', 'expense'];
-                
-                for (let i = 0; i < 100; i++) {
-                    const date = new Date(2024, Math.floor(Math.random() * 12), 1 + Math.floor(Math.random() * 28));
-                    DataStore.add({
-                        ty: types[Math.floor(Math.random() * 2)],
-                        a: Math.floor(Math.random() * 5000) + 500,
-                        c: categories[Math.floor(Math.random() * categories.length)],
-                        p: persons[Math.floor(Math.random() * persons.length)],
-                        date: date.toISOString().split('T')[0],
-                        n: 'Sample ' + (i + 1)
-                    });
-                }
-            }
-        };
-        
-        // Public API
-        return {
-            init: () => {
-                DataStore.init();
-                initSampleData();
-                initEventListeners();
-                refresh(1);
-            }
-        };
+        return { init };
     })();
 
-    // Start the application
     App.init();
 })();
 </script>
